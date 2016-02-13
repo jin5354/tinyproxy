@@ -4,4 +4,4 @@
 
 todo:
 
-# 支持二次转发，包括http、https及socks5
+- 支持二次转发，包括http、https及socks5
