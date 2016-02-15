@@ -38,7 +38,8 @@ class Proxy {
                     path: path,
                     method: req.method,
                     headers: req.headers,
-                    encoding: null
+                    encoding: null,
+                    followRedirect: false
                 };
 
                 if(reqBody.length) {
@@ -66,18 +67,14 @@ class Proxy {
                 }
 
                 request(requestOptions, function (error, response, body) {
-                    
-                    res.writeHead(response.statusCode, response.headers);
+
+                    if(error) console.log(error);
+                    console.log(response.statusCode);
+                    res.writeHead(response.statusCode, '', response.headers);
                     res.end(body);
 
                 });
 
-                /*
-                let agent = new Agent(requestOptions, 'http');
-                requestOptions.agent = agent;
-                
-                sendRequest(requestOptions, req, res);
-                */
             });
 
         } catch (e) {
@@ -130,11 +127,11 @@ class Proxy {
             });
             socket.on('error', (e) => {
                 tunnel.destroy();
-                throw new Error(e);
+                console.log(e);
             });
             tunnel.on('error', (e) => {
                 socket.destroy();
-                throw new Error(e);
+                console.log(e);
             });
             socket.on('timeout', (e) => {
                 tunnel.destroy();
