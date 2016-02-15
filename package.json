@@ -7,5 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.69.0",
+    "socks5-client": "^1.1.2",
+    "socks5-http-client": "^1.0.2",
+    "socks5-https-client": "^1.1.2"
+  }
 }
