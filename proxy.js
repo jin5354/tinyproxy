@@ -7,11 +7,13 @@ const socksClient = require('socks5-client');
 const socksHttpAgent = require ('socks5-http-client/lib/Agent');
 
 let _port;
+let _agent;
 
 class Proxy {
 
     constructor(options) {
         this.port = options.port;
+        this.agent = options.agent;
         this.onServerError = options.onServerError || () => {};
         this.onBeforeRequest = options.onBeforeRequest || () => {};
         this.onBeforeResponse = options.onBeforeResponse || () => {};
@@ -49,7 +51,7 @@ class Proxy {
                 console.log(`requestHandler: http: ${req.headers.host}`);
 
                 //若访问的是本proxy，给一个提示
-                if (requestOptions.host == '127.0.0.1' && requestOptions.port == _port) {
+                if (requestOptions.host == '127.0.0.1' && requestOptions.port == this.port) {
                     res.writeHead(200, {
                         'Content-Type': 'text/plain'
                     });
@@ -58,18 +60,19 @@ class Proxy {
                     return;
                 }
 
-                if(1) {
+                if(_agent.type === 'socks5') {
                     requestOptions.agentClass = socksHttpAgent;
                     requestOptions.agentOptions = {
-                        socksHost: '127.0.0.1',
-                        socksPort: 1080
-                    }
+                        socksHost: _agent.host,
+                        socksPort: _agent.port
+                    };
                 }
 
                 request(requestOptions, function (error, response, body) {
 
-                    if(error) console.log(error);
-                    console.log(response.statusCode);
+                    if(error) {
+                        console.log(error);
+                    }
                     res.writeHead(response.statusCode, '', response.headers);
                     res.end(body);
 
@@ -93,10 +96,10 @@ class Proxy {
 
             //this.emit('beforeRequest', requestOptions);
             let tunnel;
-            if(1) {
+            if(_agent.type === 'socks5') {
                 tunnel = socksClient.createConnection({
-                    socksHost: '127.0.0.1',
-                    socksPort: 1080,
+                    socksHost: _agent.host,
+                    socksPort: _agent.port,
                     host: rUrl.hostname,
                     port: rUrl.port
                 });
@@ -134,10 +137,12 @@ class Proxy {
                 console.log(e);
             });
             socket.on('timeout', (e) => {
+                console.log(e);
                 tunnel.destroy();
                 socket.destroy();
             });
             tunnel.on('timeout', (e) => {
+                console.log(e);
                 socket.destroy();
                 tunnel.destroy();
             });
@@ -162,6 +167,7 @@ class Proxy {
 
         server.listen(this.port);
         _port = this.port;
+        _agent = this.agent;
     }
 }
 
