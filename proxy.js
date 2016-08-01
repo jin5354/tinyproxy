@@ -6,13 +6,14 @@ const request = require('request');
 const socksClient = require('socks5-client');
 const socksHttpAgent = require ('socks5-http-client/lib/Agent');
 
-let _agent;
+let _self;
 
 class Proxy {
 
     constructor(options) {
         this.port = options.port;
         this.agent = options.agent;
+        this.mock = options.mock || null;
         this.onServerError = options.onServerError || () => {};
         this.onBeforeRequest = options.onBeforeRequest || () => {};
         this.onBeforeResponse = options.onBeforeResponse || () => {};
@@ -47,7 +48,7 @@ class Proxy {
                     requestOptions.body = reqBody;
                 }
 
-                console.log(`requestHandler: http: ${req.headers.host}`);
+                console.log(`HTTP ${req.method}: ${req.url}`);
 
                 //若访问的是本proxy，给一个提示
                 if (requestOptions.host == '127.0.0.1' && requestOptions.port == this.port) {
@@ -59,27 +60,39 @@ class Proxy {
                     return;
                 }
 
-                if(_agent.type === 'socks5') {
+                if(_self.agent.type === 'socks5') {
                     requestOptions.agentClass = socksHttpAgent;
                     requestOptions.agentOptions = {
-                        socksHost: _agent.host,
-                        socksPort: _agent.port
+                        socksHost: _self.agent.host,
+                        socksPort: _self.agent.port
                     };
                 }
 
+                _self.emit('beforeRequest', requestOptions);
                 request(requestOptions, function (error, response, body) {
 
                     if(error) {
+                        _self.emit('requestError', error);
                         console.log(error);
                     }
-                    res.writeHead(response.statusCode, '', response.headers);
-                    res.end(body);
+                    try {
+                        _self.emit('beforeResponse', response, body);
+                        if(_self.mock) {
+                            _self.mock(req, res, response, body);
+                        }else {
+                            res.writeHead(response.statusCode, '', response.headers);
+                            res.end(body);
+                        }
+                    }catch(e) {
+                        console.log(e);
+                    }
 
                 });
 
             });
 
         } catch (e) {
+            _self.emit('error', e);
             console.log(`requestHandlerError': ${e.message}`);
         }
 
@@ -93,12 +106,11 @@ class Proxy {
 
             console.log(`connectHandler: ${rUrl.hostname}`);
 
-            //this.emit('beforeRequest', requestOptions);
             let tunnel;
-            if(_agent.type === 'socks5') {
+            if(_self.agent.type === 'socks5') {
                 tunnel = socksClient.createConnection({
-                    socksHost: _agent.host,
-                    socksPort: _agent.port,
+                    socksHost: _self.agent.host,
+                    socksPort: _self.agent.port,
                     host: rUrl.hostname,
                     port: rUrl.port
                 });
@@ -153,9 +165,8 @@ class Proxy {
     }
 
     start() {
-
         let server = http.createServer();
-
+        _self = this;
         server.on('request', this.requestHandler);
         server.on('connect', this.connectHandler);
 
@@ -165,7 +176,6 @@ class Proxy {
         server.on('requestError', this.onRequestError);
 
         server.listen(this.port);
-        _agent = this.agent;
     }
 }
 
