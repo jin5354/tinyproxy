@@ -21,7 +21,7 @@ class Proxy {
     }
 
     requestHandler(req, res) {
-
+        let self = this;
         try {
             delete req.headers['proxy-connection'];
             req.headers['connection'] = 'close';
@@ -68,15 +68,15 @@ class Proxy {
                     };
                 }
 
-                _self.emit('beforeRequest', requestOptions);
+                self.emit('beforeRequest', requestOptions);
                 request(requestOptions, function (error, response, body) {
 
                     if(error) {
-                        _self.emit('requestError', error);
+                        self.emit('requestError', error);
                         console.log(error);
                     }
                     try {
-                        _self.emit('beforeResponse', response, body);
+                        self.emit('beforeResponse', response, body);
                         if(_self.mock) {
                             _self.mock(req, res, response, body);
                         }else {
@@ -92,7 +92,7 @@ class Proxy {
             });
 
         } catch (e) {
-            _self.emit('error', e);
+            self.emit('error', e);
             console.log(`requestHandlerError': ${e.message}`);
         }
 
