@@ -1,13 +1,13 @@
 {
   "name": "tinyproxy",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A tiny transparent proxy with http/https support、socks5 forward and mock feature.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "request": "^2.69.0",
     "socks5-client": "^1.1.2",

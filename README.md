@@ -2,8 +2,6 @@
 
 支持http、https的透明转发代理，支持抓包改包，目前支持socks5的二次转发。
 
-> 主要fork自`mini-proxy`
-
 ### 使用
 
 ```javascript
@@ -38,3 +36,6 @@ let mock = (req, res, response, body) => {  //req:原始请求 res:回送数据 
     res.end(result.body);
 };
 ```
+
+### 致谢
+[mini-proxy](https://github.com/liyangready/mini-proxy)
