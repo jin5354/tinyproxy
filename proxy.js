@@ -6,7 +6,6 @@ const request = require('request');
 const socksClient = require('socks5-client');
 const socksHttpAgent = require ('socks5-http-client/lib/Agent');
 
-let _port;
 let _agent;
 
 class Proxy {
@@ -166,7 +165,6 @@ class Proxy {
         server.on('requestError', this.onRequestError);
 
         server.listen(this.port);
-        _port = this.port;
         _agent = this.agent;
     }
 }
