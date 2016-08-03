@@ -14,10 +14,10 @@ class Proxy {
         this.port = options.port;
         this.agent = options.agent;
         this.mock = options.mock || null;
-        this.onServerError = options.onServerError || () => {};
-        this.onBeforeRequest = options.onBeforeRequest || () => {};
-        this.onBeforeResponse = options.onBeforeResponse || () => {};
-        this.onRequestError = options.onRequestError || () => {};
+        this.onServerError = options.onServerError || (() => {});
+        this.onBeforeRequest = options.onBeforeRequest || (() => {});
+        this.onBeforeResponse = options.onBeforeResponse || (() => {});
+        this.onRequestError = options.onRequestError || (() => {});
     }
 
     requestHandler(req, res) {
