@@ -69,26 +69,25 @@ class Proxy {
                 }
 
                 self.emit('beforeRequest', requestOptions);
-                request(requestOptions, function (error, response, body) {
 
-                    if(error) {
-                        self.emit('requestError', error);
-                        console.log(error);
-                    }
-                    try {
-                        self.emit('beforeResponse', response, body);
-                        if(_self.mock) {
-                            _self.mock(req, res, response, body);
-                        }else {
+                if(_self.mock) {
+                    _self.mock(req, res, requestOptions);
+                } else {
+                    request(requestOptions, function (error, response, body) {
+                        if(error) {
+                            self.emit('requestError', error);
+                            console.log(error);
+                        }
+                        try {
+                            self.emit('beforeResponse', response, body);
                             res.writeHead(response.statusCode, '', response.headers);
                             res.end(body);
+                        }catch(e) {
+                            console.log(e);
                         }
-                    }catch(e) {
-                        console.log(e);
-                    }
 
-                });
-
+                    });
+                }
             });
 
         } catch (e) {
