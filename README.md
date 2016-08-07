@@ -30,9 +30,9 @@ console.log(`proxy started! Listening on port 9999.`);
 
 //mock 处理函数
 
-let mock = (req, res, response, body) => {  //req:原始请求 res:回送数据 response:接收数据 body:接收数据body
+let mock = (req, res, requestOptions) => {  //req:原始请求 res:回送数据 requestOptions:处理后的req，可以直接用于request库
     console.log(`MOCK ${req.method}: ${req.url}`);
-    res.writeHead(response.statusCode, '', result.headers);
+    res.writeHead(result.statusCode, '', result.headers); //自己的mock数据...
     res.end(result.body);
 };
 ```
