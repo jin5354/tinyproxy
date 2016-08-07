@@ -16,7 +16,7 @@ console.log(`proxy started! Listening on port 9999.`);
 
 可配置项：
 
-```json
+```javascript
 {
     port: 9999,
     agent: 'http',
@@ -36,6 +36,10 @@ let mock = (req, res, requestOptions) => {  //req:原始请求 res:回送数据 
     res.end(result.body);
 };
 ```
+
+### license
+
+MIT
 
 ### 致谢
 [mini-proxy](https://github.com/liyangready/mini-proxy)
