@@ -1,6 +1,6 @@
 {
   "name": "tinyproxy",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "description": "A tiny transparent proxy with http/https support、socks5 forward and mock feature.",
   "main": "proxy.js",
   "scripts": {
